@@ -1,0 +1,39 @@
+/ZLAC:
+  ros__parameters:
+    AW: 0.39
+    WD: 0.1
+    WO1: 0.566
+    WO2: 0.165
+    qos_overrides:
+      /parameter_events:
+        publisher:
+          depth: 1000
+          durability: volatile
+          history: keep_last
+          reliability: reliable
+    use_sim_time: false
+
+/dynamixel_controller:
+  ros__parameters:
+    AW: 0.39
+    WD: 0.1
+    WO1: 0.566
+    WO2: 0.165
+    qos_overrides:
+      /parameter_events:
+        publisher:
+          depth: 1000
+          durability: volatile
+          history: keep_last
+          reliability: reliable
+    use_sim_time: false
+
+/velocity_smoother:
+  ros__parameters:
+    smoothing_frequency: 20.0
+    max_velocity: [0.1, 0.0, 2.5]
+    min_velocity: [-0.1, 0.0, -2.5]
+    deadband_velocity: [0.0, 0.0, 0.0]
+    velocity_timeout: 1.0
+    max_accel: [0.1, 0.0, 3.2]
+    max_decel: [-0.1, 0.0, -3.2]
