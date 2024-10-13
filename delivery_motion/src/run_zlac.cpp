@@ -49,28 +49,28 @@ void ZLAC_Twist::twist_cb(const geometry_msgs::msg::Twist msg) {
   wheel_omega[3] = v * sqrt(pow((radius + axleWidth_ / 2), 2) + pow((wheelOffset2_ / 2), 2)) / radius / (wheelDiameter_ / 2);
 
   if (std::abs(v) < 0.01 && std::abs(omega) > 0.01) { // rot. in place
-    motor_rpm_[0] = -1 * sqrt(pow(wheelOffset1_, 2) + pow(axleWidth_ / 2, 2)) * omega / (wheelDiameter_ / 2) * 30 / PI;
-    motor_rpm_[1] = motor_rpm_[0];
-    motor_rpm_[2] = -1 * sqrt(pow(wheelOffset2_, 2) + pow(axleWidth_ / 2, 2)) * omega / (wheelDiameter_ / 2) * 30 / PI;
-    motor_rpm_[3] = motor_rpm_[2];
+    motor_rpm_[0] = sqrt(pow(wheelOffset1_, 2) + pow(axleWidth_ / 2, 2)) * omega / (wheelDiameter_ / 2) * 30 / PI;
+    motor_rpm_[1] = -1 * motor_rpm_[0];
+    motor_rpm_[2] = sqrt(pow(wheelOffset2_, 2) + pow(axleWidth_ / 2, 2)) * omega / (wheelDiameter_ / 2) * 30 / PI;
+    motor_rpm_[3] = -1 * motor_rpm_[2];
   }
   else if (omega < -0.01) {
     motor_rpm_[0] = wheel_omega[1] * 30 / PI;
-    motor_rpm_[1] = -1 * wheel_omega[0] * 30 / PI;
-    motor_rpm_[2] = wheel_omega[3] * 30 / PI;
+    motor_rpm_[1] = wheel_omega[0] * 30 / PI;
+    motor_rpm_[2] = -1 * wheel_omega[3] * 30 / PI;
     motor_rpm_[3] = -1 * wheel_omega[2] * 30 / PI;
   }
   else if (omega > 0.01) {
     motor_rpm_[0] = wheel_omega[0] * 30 / PI;
-    motor_rpm_[1] = -1 * wheel_omega[1] * 30 / PI;
-    motor_rpm_[2] = wheel_omega[2] * 30 / PI;
+    motor_rpm_[1] = wheel_omega[1] * 30 / PI;
+    motor_rpm_[2] = -1 * wheel_omega[2] * 30 / PI;
     motor_rpm_[3] = -1 * wheel_omega[3] * 30 / PI;
   }
   else {
     double rpm = (60 * v) / (wheelDiameter_ * PI);
     motor_rpm_[0] = rpm;
-    motor_rpm_[1] = -1 * rpm;
-    motor_rpm_[2] = rpm;
+    motor_rpm_[1] = rpm;
+    motor_rpm_[2] = -1 * rpm;
     motor_rpm_[3] = -1 * rpm;
   }
 }
