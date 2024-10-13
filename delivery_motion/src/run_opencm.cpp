@@ -9,7 +9,7 @@ using std::placeholders::_1;
 DynamixelController::DynamixelController() : Node("dynamixel_controller") {
     declare_parameter("WO1", 0.3);
     declare_parameter("WO2", 0.3);
-    declare_parameter("AW", 0.4);
+    declare_parameter("AW", 0.643);
     get_parameter("WO1", wheelOffset1_);
     get_parameter("WO2", wheelOffset2_);
     get_parameter("AW", axleWidth_);
