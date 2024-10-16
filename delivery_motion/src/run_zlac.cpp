@@ -55,14 +55,14 @@ void ZLAC_Twist::twist_cb(const geometry_msgs::msg::Twist msg) {
     motor_rpm_[3] = -1 * motor_rpm_[2];
   }
   else if (omega < -0.01) {
-    motor_rpm_[0] = wheel_omega[1] * 30 / PI;
-    motor_rpm_[1] = wheel_omega[0] * 30 / PI;
+    motor_rpm_[0] = wheel_omega[0] * 30 / PI;
+    motor_rpm_[1] = wheel_omega[1] * 30 / PI;
     motor_rpm_[2] = -1 * wheel_omega[3] * 30 / PI;
     motor_rpm_[3] = -1 * wheel_omega[2] * 30 / PI;
   }
   else if (omega > 0.01) {
-    motor_rpm_[0] = wheel_omega[0] * 30 / PI;
-    motor_rpm_[1] = wheel_omega[1] * 30 / PI;
+    motor_rpm_[0] = wheel_omega[1] * 30 / PI;
+    motor_rpm_[1] = wheel_omega[0] * 30 / PI;
     motor_rpm_[2] = -1 * wheel_omega[2] * 30 / PI;
     motor_rpm_[3] = -1 * wheel_omega[3] * 30 / PI;
   }
