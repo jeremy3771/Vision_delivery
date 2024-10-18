@@ -138,7 +138,6 @@ void RegulatedPurePursuitController::configure()
   declare_parameter("transform_tolerance", 0.1);
   declare_parameter("use_velocity_scaled_lookahead_dist", true);
   declare_parameter("approach_velocity_scaling_dist", 0.6);
-  declare_parameter("max_allowed_time_to_collision_up_to_carrot", 1.0);
   declare_parameter("use_regulated_linear_velocity_scaling", true);
   declare_parameter("regulated_linear_scaling_min_radius", 0.9);
   // applyConstraints func => min speed
@@ -146,7 +145,6 @@ void RegulatedPurePursuitController::configure()
   declare_parameter("use_rotate_to_heading", true);
   declare_parameter("rotate_to_heading_min_angle", 0.785);
   declare_parameter("max_angular_accel", 3.2);
-  declare_parameter("allow_reversing", false);
   declare_parameter("max_robot_pose_search_dist", -1.0);
   declare_parameter("use_interpolation", true);
 
@@ -159,28 +157,16 @@ void RegulatedPurePursuitController::configure()
   get_parameter("transform_tolerance", transform_tolerance);
   get_parameter("use_velocity_scaled_lookahead_dist", use_velocity_scaled_lookahead_dist_);
   get_parameter("approach_velocity_scaling_dist", approach_velocity_scaling_dist_);
-  get_parameter("max_allowed_time_to_collision_up_to_carrot", max_allowed_time_to_collision_up_to_carrot_);
   get_parameter("use_regulated_linear_velocity_scaling", use_regulated_linear_velocity_scaling_);
   get_parameter("regulated_linear_scaling_min_radius", regulated_linear_scaling_min_radius_);
   get_parameter("regulated_linear_scaling_min_speed", regulated_linear_scaling_min_speed_);
   get_parameter("use_rotate_to_heading", use_rotate_to_heading_);
   get_parameter("rotate_to_heading_min_angle", rotate_to_heading_min_angle_);
   get_parameter("max_angular_accel", max_angular_accel_);
-  get_parameter("allow_reversing", allow_reversing_);
   get_parameter("max_robot_pose_search_dist", max_robot_pose_search_dist_);
   get_parameter("use_interpolation", use_interpolation_);
 
   transform_tolerance_ = tf2::durationFromSec(transform_tolerance);
-
-  /** Possible to drive in reverse direction if and only if
-   "use_rotate_to_heading" parameter is set to false **/
-
-  if (use_rotate_to_heading_ && allow_reversing_) {
-    RCLCPP_WARN(
-      logger_, "Disabling reversing. Both use_rotate_to_heading and allow_reversing "
-      "parameter cannot be set to true. By default setting use_rotate_to_heading true");
-    allow_reversing_ = false;
-  }
 
   goal_checker_ = new SimpleGoalChecker();
   odom_sub_ = this->create_subscription<nav_msgs::msg::Odometry>(
