@@ -212,7 +212,6 @@ protected:
   tf2::Duration transform_tolerance_;
   double min_approach_linear_velocity_;
   double approach_velocity_scaling_dist_;
-  double max_allowed_time_to_collision_up_to_carrot_;
   bool use_regulated_linear_velocity_scaling_;
   double regulated_linear_scaling_min_radius_;
   double regulated_linear_scaling_min_speed_;
@@ -220,7 +219,6 @@ protected:
   double max_angular_accel_;
   double rotate_to_heading_min_angle_;
   double goal_dist_tol_;
-  bool allow_reversing_;
   double max_robot_pose_search_dist_;
   bool use_interpolation_;
   geometry_msgs::msg::Twist current_twist_;
