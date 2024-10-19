@@ -6,9 +6,9 @@ using std::placeholders::_1;
 #define PI 3.1415926535897932
 
 ZLAC_Twist::ZLAC_Twist() : Node("ZLAC"), front_mots("/dev/ttyUSB0", 115200, 0x01), rear_mots("/dev/ttyUSB1", 115200, 0x01) {
-  declare_parameter("WO1", 0.3);
-  declare_parameter("WO2", 0.3);
-  declare_parameter("AW", 0.643);
+  declare_parameter("WO1", 0.285);
+  declare_parameter("WO2", 0.285);
+  declare_parameter("AW", 0.453);
   declare_parameter("WD", 0.13);
   get_parameter("WO1", wheelOffset1_);
   get_parameter("WO2", wheelOffset2_);
