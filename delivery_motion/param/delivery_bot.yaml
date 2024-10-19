@@ -1,9 +1,9 @@
 /ZLAC:
   ros__parameters:
-    AW: 0.643
+    AW: 0.453
     WD: 0.13
-    WO1: 0.3
-    WO2: 0.3
+    WO1: 0.285
+    WO2: 0.285
     qos_overrides:
       /parameter_events:
         publisher:
@@ -15,10 +15,10 @@
 
 /dynamixel_controller:
   ros__parameters:
-    AW: 0.3643
+    AW: 0.453
     WD: 0.13
-    WO1: 0.3
-    WO2: 0.3
+    WO1: 0.285
+    WO2: 0.285
     qos_overrides:
       /parameter_events:
         publisher:
