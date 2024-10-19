@@ -40,7 +40,7 @@ public:
             "scan", qos_profile);
 
         point_subscriber_ = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-            "livox/lidar", qos_profile, std::bind(&pointcloud_to_laserscan::subscribe_cloud, this, _1));
+            "livox/roi_lidar", qos_profile, std::bind(&pointcloud_to_laserscan::subscribe_cloud, this, _1));
     }
 private:
     void subscribe_cloud(const sensor_msgs::msg::PointCloud2::SharedPtr cloud) const {
@@ -52,7 +52,7 @@ private:
     std::unique_ptr<sensor_msgs::msg::LaserScan> make_twoD(const sensor_msgs::msg::PointCloud2::SharedPtr cloud) const {
         auto scan_msg = std::make_unique<sensor_msgs::msg::LaserScan>();
         scan_msg->header = cloud->header;
-        scan_msg->header.frame_id = "base_scan";
+        scan_msg->header.frame_id = "livox_frame";
         scan_msg->angle_min = angle_min_;
         scan_msg->angle_max = angle_max_;
         scan_msg->angle_increment = angle_increment_;
