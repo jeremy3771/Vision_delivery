@@ -30,6 +30,11 @@
 #define DXL_R_LEFT_ID                   3       // ID of middle left motor
 #define DXL_R_RIGHT_ID                  4       // ID of middle right motor
 
+#define DXL_GIMBAL1_ID                  10
+#define DXL_GIMBAL2_ID                  11
+#define DXL_GIMBAL3_ID                  12
+#define DXL_GIMBAL4_ID                  13
+
 #define TORQUE_ENABLE                   1       // Value for enabling the torque
 #define TORQUE_DISABLE                  0
 
@@ -40,7 +45,8 @@ public:
     bool init();
     void close();
     bool setTorque(bool enable);
-    bool writePosition(const int64_t value[6]);
+    bool writeYawPosition(const int64_t value[4]);
+    bool writeGimbalPosition(const int64_t value[4]);
 private:
     uint32_t baudrate_;
     dynamixel::PortHandler *portHandler_;
