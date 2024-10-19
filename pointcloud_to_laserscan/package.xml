@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>point_to_laser</name>
+  <name>pointcloud_to_laserscan</name>
   <version>0.0.1</version>
   <description>Convert PointCloud2 to LaserScan</description>
   <maintainer email="jeremy3771@naver.com">mh</maintainer>
