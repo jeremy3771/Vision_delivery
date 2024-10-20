@@ -18,7 +18,7 @@ DynamixelController::DynamixelController() : Node("dynamixel_controller") {
     std::fill(gimbalPos_, gimbalPos_ + 4, 2048);
 
     sub_ = this->create_subscription<geometry_msgs::msg::Twist>("cmd_vel_smoothed", 10, std::bind(&DynamixelController::twist_cb ,this, _1));
-    gimbal_sub_ = this->create_subscription<std_msgs::msg::Int8MultiArray>("gimbal_pos", 10, std::bind(&DynamixelController::gimbal_callback, this, std::placeholders::_1));
+    gimbal_sub_ = this->create_subscription<std_msgs::msg::Int32MultiArray>("gimbal_pos", 10, std::bind(&DynamixelController::gimbal_callback, this, std::placeholders::_1));
     timer_ = this->create_wall_timer(50ms, std::bind(&DynamixelController::timer_cb, this));
 }
 
@@ -51,7 +51,7 @@ void DynamixelController::twist_cb(const geometry_msgs::msg::Twist msg) {
     }
 }
 
-void DynamixelController::gimbal_callback(const std_msgs::msg::Int8MultiArray::SharedPtr msg) {
+void DynamixelController::gimbal_callback(const std_msgs::msg::Int32MultiArray::SharedPtr msg) {
     for (int i = 0; i < 4; i++) {
       gimbalPos_[i] = msg->data[i];
     }
