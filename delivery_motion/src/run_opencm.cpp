@@ -28,20 +28,20 @@ void DynamixelController::twist_cb(const geometry_msgs::msg::Twist msg) {
     if (msg.angular.z < -0.001 && radius > 0.01) {
         yawPos_[0] = 2048 + (std::atan2(wheelOffset1_, radius + (axleWidth_ / 2)) * 2048 / PI);
         yawPos_[1] = 2048 + (std::atan2(wheelOffset1_, radius - (axleWidth_ / 2)) * 2048 / PI);
-        yawPos_[2] = 2048 + (std::atan2(wheelOffset2_, radius + (axleWidth_ / 2)) * 2048 / PI);
-        yawPos_[3] = 2048 + (std::atan2(wheelOffset2_, radius - (axleWidth_ / 2)) * 2048 / PI);
+        yawPos_[2] = 2048 - (std::atan2(wheelOffset2_, radius + (axleWidth_ / 2)) * 2048 / PI);
+        yawPos_[3] = 2048 - (std::atan2(wheelOffset2_, radius - (axleWidth_ / 2)) * 2048 / PI);
     }
     else if (msg.angular.z > 0.001 && radius > 0.01) {
         yawPos_[0] = 2048 - (std::atan2(wheelOffset1_, radius - (axleWidth_ / 2)) * 2048 / PI);
         yawPos_[1] = 2048 - (std::atan2(wheelOffset1_, radius + (axleWidth_ / 2)) * 2048 / PI);
-        yawPos_[2] = 2048 - (std::atan2(wheelOffset2_, radius - (axleWidth_ / 2)) * 2048 / PI);
-        yawPos_[3] = 2048 - (std::atan2(wheelOffset2_, radius + (axleWidth_ / 2)) * 2048 / PI);
+        yawPos_[2] = 2048 + (std::atan2(wheelOffset2_, radius - (axleWidth_ / 2)) * 2048 / PI);
+        yawPos_[3] = 2048 + (std::atan2(wheelOffset2_, radius + (axleWidth_ / 2)) * 2048 / PI);
     }
     else if (std::abs(msg.angular.z) > 0.001 && msg.linear.x < 0.001) { // rot. in place
         yawPos_[0] = 2048 + (std::atan2(wheelOffset1_, (axleWidth_ / 2)) * 2048 / PI);
         yawPos_[1] = 2048 - (std::atan2(wheelOffset1_, (axleWidth_ / 2)) * 2048 / PI);
-        yawPos_[2] = 2048 + (std::atan2(wheelOffset2_, (axleWidth_ / 2)) * 2048 / PI);
-        yawPos_[3] = 2048 - (std::atan2(wheelOffset2_, (axleWidth_ / 2)) * 2048 / PI);
+        yawPos_[2] = 2048 - (std::atan2(wheelOffset2_, (axleWidth_ / 2)) * 2048 / PI);
+        yawPos_[3] = 2048 + (std::atan2(wheelOffset2_, (axleWidth_ / 2)) * 2048 / PI);
     }
     else {
         yawPos_[0] = 2048;
