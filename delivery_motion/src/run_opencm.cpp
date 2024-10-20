@@ -14,7 +14,7 @@ DynamixelController::DynamixelController() : Node("dynamixel_controller") {
     get_parameter("WO2", wheelOffset2_);
     get_parameter("AW", axleWidth_);
 
-    std::fill(motPos_, motPos_ + 4, 2048);
+    std::fill(motPos_, yawPos_ + 4, 2048);
     std::fill(gimbalPos_, gimbalPos_ + 4, 2048);
 
     sub_ = this->create_subscription<geometry_msgs::msg::Twist>("cmd_vel_smoothed", 10, std::bind(&DynamixelController::twist_cb ,this, _1));
