@@ -36,9 +36,12 @@ private:
     /// @param[in] cloud PCL PointCloud2 Data
     /// @param[in] filterRes XYZ Leaf Size
     /// @param[in] minPoint ROI Min Point
-    /// @param[in] maxPoint ROI Max Point
+    /// @param[in] maxPoint ROI Max Points
     pcl::PointCloud<pcl::PointXYZ>::Ptr FilterCloud(
-        pcl::PointCloud<pcl::PointXYZ>::Ptr cloud);
+        pcl::PointCloud<pcl::PointXYZ>::Ptr      cloud,
+        double                                   filterRes,
+        Eigen::Vector4f                          minPoint,
+        Eigen::Vector4f                          maxPoint);
 
     /// @brief Detect object using PointCloud2
     /// @param[in] cloud_msg ROS2 PointCloud2 data

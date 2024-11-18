@@ -1,8 +1,8 @@
 /RPP_Controller:
   ros__parameters:
     approach_velocity_scaling_dist: 0.6
-    desired_linear_vel: 1.5
-    lookahead_time: 1.5
+    desired_linear_vel: 0.5
+    lookahead_time: 1.0
     max_angular_accel: 3.2
     max_lookahead_dist: 0.9
     max_robot_pose_search_dist: -1.0

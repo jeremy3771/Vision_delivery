@@ -4,7 +4,7 @@
     angle_max: 3.141592653589793
     angle_min: -3.141592653589793
     max_height: 0.0
-    min_height: -0.3
+    min_height: -0.4
     qos_overrides:
       /parameter_events:
         publisher:
@@ -13,6 +13,6 @@
           history: keep_last
           reliability: reliable
     range_max: 1.7976931348623157e+308
-    range_min: 0.3
+    range_min: 0.2
     scan_time: 0.03333333333333333
     use_sim_time: false

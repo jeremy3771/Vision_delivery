@@ -18,8 +18,11 @@
 #include "geometry_msgs/msg/pose2_d.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
+#include <geometry_msgs/msg/transform_stamped.hpp>
 #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
+#include <tf2_msgs/msg/tf_message.hpp>
 #include "tf2/utils.h"
+#include <tf2/LinearMath/Quaternion.h>
 #include "tf2_ros/buffer.h"
 #include "nav_msgs/msg/odometry.hpp"
 #include "nav_msgs/msg/path.hpp"
@@ -78,6 +81,10 @@ public:
   void odom_cb(const nav_msgs::msg::Odometry::SharedPtr msg);
 
   void twist_cb(const geometry_msgs::msg::Twist msg);
+  
+  void tf_cb(const tf2_msgs::msg::TFMessage::SharedPtr msg);
+
+  bool getOdomToMapTransform(geometry_msgs::msg::TransformStamped & odom_to_map);
 
   void readPathFromYAML();
 protected:
@@ -221,13 +228,19 @@ protected:
   double goal_dist_tol_;
   double max_robot_pose_search_dist_;
   bool use_interpolation_;
+  int total_path_;
+  int remain_path_;
+  bool speed_warn_;
   geometry_msgs::msg::Twist current_twist_;
   geometry_msgs::msg::PoseStamped current_pose_;
+  geometry_msgs::msg::TransformStamped map2odom_tf_;
+  geometry_msgs::msg::TransformStamped odom2map_tf_;
 
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr twist_sub_;
-  rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr vel_pub_;
+  rclcpp::Subscription<tf2_msgs::msg::TFMessage>::SharedPtr tf_sub_;
+  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr vel_pub_;
   nav_msgs::msg::Path global_plan_;
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr global_path_pub_;
   // rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr carrot_pub_;

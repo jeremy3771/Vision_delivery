@@ -11,6 +11,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(tf2 REQUIRED)
+find_package(tf2_msgs REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(angles REQUIRED)
 find_package(tf2_ros REQUIRED)
@@ -26,6 +27,7 @@ ament_target_dependencies(delivery_autonomous
   nav_msgs
   std_msgs
   tf2
+  tf2_msgs
   tf2_geometry_msgs
   angles
   tf2_ros
