@@ -7,89 +7,83 @@ path:
       y: 0.0
       z: 0.0
     velocity:
-      linear_x: 0.8
+      linear_x: 0.7
   - point:
       x: 2.04
       y: 0.09
       z: 0.0
     velocity:
-      linear_x: 0.8
+      linear_x: 0.7
   #구간 2 - 좌회전 직진
   - point:
       x: 5.59
       y: 2.94
       z: 0.0
     velocity:
-      linear_x: 0.8
+      linear_x: 0.7
   - point:
-      x: 5.48
-      y: 6.91
+      x: 5.42
+      y: 7.73
       z: 0.0
     velocity:
-      linear_x: 0.8
+      linear_x: 0.7
       #구간 4 - 직진
   - point:
       x: 8.59
       y: 15.12
       z: 0.0
     velocity:
-      linear_x: 1.2
+      linear_x: 0.7
   - point:
-      x: 9.18
-      y: 17.03
-      z: 0.0
-    velocity:
-      linear_x: 1.0
-  - point:
-      x: 8.90
+      x: 8.74
       y: 17.96
       z: 0.0
     velocity:
-      linear_x: 0.5
+      linear_x: 0.7
   - point:
       x: 8.79
       y: 20.24
       z: 0.0
     velocity:
-      linear_x: 0.8
+      linear_x: 0.7
   - point:
       x: 8.33
       y: 21.45
       z: 0.0
     velocity:
-      linear_x: 0.8
+      linear_x: 0.7
   - point:
       x: 6.92
       y: 22.43
       z: 0.0
     velocity:
-      linear_x: 0.8
+      linear_x: 0.7
   - point:
       x: 4.12
       y: 22.55
       z: 0.0
     velocity:
-      linear_x: 1.2
+      linear_x: 0.7
   - point:
       x: -1.74
       y: 22.89
       z: 0.0
     velocity:
-      linear_x: 0.8
+      linear_x: 0.7
   - point:
       x: -3.63
       y: 23.27
       z: 0.0
     velocity:
-      linear_x: 0.8
+      linear_x: 0.
   - point:
       x: -4.96
       y: 22.86
       z: 0.0
     velocity:
-      linear_x: 0.5
+      linear_x: 0.7
   - point:
-      x: -5.43
+      x: -5.53
       y: 21.44
       z: 0.0
     velocity:

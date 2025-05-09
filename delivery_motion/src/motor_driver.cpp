@@ -54,30 +54,30 @@ bool MotorCommand::setTorque(bool enable) {
     else if(dxl_error != 0)
         return false;
 
-    // Gimbal Dynamixels
-    dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, DXL_GIMBAL1_ID, ADDR_X_TORQUE_ENABLE, enable, &dxl_error);
-    if(dxl_comm_result != COMM_SUCCESS)
-        return false;
-    else if(dxl_error != 0)
-        return false;
+    // // Gimbal Dynamixels
+    // dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, DXL_GIMBAL1_ID, ADDR_X_TORQUE_ENABLE, enable, &dxl_error);
+    // if(dxl_comm_result != COMM_SUCCESS)
+    //     return false;
+    // else if(dxl_error != 0)
+    //     return false;
 
-    dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, DXL_GIMBAL2_ID, ADDR_X_TORQUE_ENABLE, enable, &dxl_error);
-    if(dxl_comm_result != COMM_SUCCESS)
-        return false;
-    else if(dxl_error != 0)
-        return false;
+    // dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, DXL_GIMBAL2_ID, ADDR_X_TORQUE_ENABLE, enable, &dxl_error);
+    // if(dxl_comm_result != COMM_SUCCESS)
+    //     return false;
+    // else if(dxl_error != 0)
+    //     return false;
 
-    dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, DXL_GIMBAL3_ID, ADDR_X_TORQUE_ENABLE, enable, &dxl_error);
-    if(dxl_comm_result != COMM_SUCCESS)
-        return false;
-    else if(dxl_error != 0)
-        return false;
+    // dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, DXL_GIMBAL3_ID, ADDR_X_TORQUE_ENABLE, enable, &dxl_error);
+    // if(dxl_comm_result != COMM_SUCCESS)
+    //     return false;
+    // else if(dxl_error != 0)
+    //     return false;
 
-    dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, DXL_GIMBAL4_ID, ADDR_X_TORQUE_ENABLE, enable, &dxl_error);
-    if(dxl_comm_result != COMM_SUCCESS)
-        return false;
-    else if(dxl_error != 0)
-        return false;
+    // dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, DXL_GIMBAL4_ID, ADDR_X_TORQUE_ENABLE, enable, &dxl_error);
+    // if(dxl_comm_result != COMM_SUCCESS)
+    //     return false;
+    // else if(dxl_error != 0)
+    //     return false;
 
     return true;
 }

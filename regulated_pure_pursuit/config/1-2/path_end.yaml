@@ -1,0 +1,67 @@
+# path.yaml
+#도착후
+path:
+#구간 1 - 직진
+  - point:
+      x: -4.26
+      y: 20.14
+      z: 0.0
+    velocity:
+      linear_x: 0.5
+  - point:
+      x: -2.28
+      y: 20.12
+      z: 0.0
+    velocity:
+      linear_x: 0.7
+  #구간 2 - 좌회전 직진
+  - point:
+      x: 0.18
+      y: 20.45
+      z: 0.0
+    velocity:
+      linear_x: 0.7
+  - point:
+      x: 6.33
+      y: 20.50
+      z: 0.0
+    velocity:
+      linear_x: 0.7
+      #구간 4 - 직진
+  - point:
+      x: 8.06
+      y: 19.72
+      z: 0.0
+    velocity:
+      linear_x: 0.7
+  - point:
+      x: 8.64
+      y: 17.25
+      z: 0.0
+    velocity:
+      linear_x: 0.7
+  - point:
+      x: 8.73
+      y: 9.62
+      z: 0.0
+    velocity:
+      linear_x: 0.7
+  - point:
+      x: 6.55
+      y: 5.34
+      z: 0.0
+    velocity:
+      linear_x: 0.7
+  - point:
+      x: 3.47
+      y: 0.34
+      z: 0.0
+    velocity:
+      linear_x: 0.7
+  - point:
+      x: -0.79
+      y: 0.09
+      z: 0.0
+    velocity:
+      linear_x: 0.0
+  

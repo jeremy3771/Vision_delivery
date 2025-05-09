@@ -41,7 +41,7 @@ path:
     velocity:
       linear_x: 1.0
   - point:
-      x: 8.90
+      x: 8.74
       y: 17.96
       z: 0.0
     velocity:
@@ -89,7 +89,7 @@ path:
     velocity:
       linear_x: 0.5
   - point:
-      x: -5.43
+      x: -5.53
       y: 21.44
       z: 0.0
     velocity:

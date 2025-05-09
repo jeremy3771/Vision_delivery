@@ -26,7 +26,7 @@ VelocitySmoother::VelocitySmoother() : Node("velocity_smoother") {
   timer_ = this->create_wall_timer(
     std::chrono::milliseconds(static_cast<int>(timer_duration_ms)),
     std::bind(&VelocitySmoother::smootherTimer, this));
-  twist_sub_ = this->create_subscription<geometry_msgs::msg::Twist>("cmd_vel", 1, std::bind(&VelocitySmoother::twist_cb, this, _1));
+  twist_sub_ = this->create_subscription<geometry_msgs::msg::Twist>("cmd_vel", rclcpp::QoS(1).best_effort(), std::bind(&VelocitySmoother::twist_cb, this, _1));
   publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("cmd_vel_smoothed", 1);
 }
 

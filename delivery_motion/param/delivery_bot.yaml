@@ -1,9 +1,9 @@
 /ZLAC:
   ros__parameters:
-    AW: 0.453
-    WD: 0.13
-    WO1: 0.285
-    WO2: 0.285
+    AW: 0.445
+    WD: 0.23
+    WO1: 0.391
+    WO2: 0.391
     qos_overrides:
       /parameter_events:
         publisher:
@@ -15,10 +15,10 @@
 
 /dynamixel_controller:
   ros__parameters:
-    AW: 0.453
-    WD: 0.13
-    WO1: 0.285
-    WO2: 0.285
+    AW: 0.445
+    WD: 0.23
+    WO1: 0.391
+    WO2: 0.391
     qos_overrides:
       /parameter_events:
         publisher:
@@ -35,5 +35,5 @@
     min_velocity: [-3.0, 0.0, -2.0]
     deadband_velocity: [0.0, 0.0, 0.0]
     velocity_timeout: 1.0
-    max_accel: [2.0, 0.0, 2.0]
-    max_decel: [-2.0, 0.0, -2.0]
+    max_accel: [1.0, 0.0, 1.0]
+    max_decel: [-1.0, 0.0, -1.0]

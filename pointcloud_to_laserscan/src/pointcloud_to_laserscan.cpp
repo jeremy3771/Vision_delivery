@@ -17,8 +17,8 @@ public:
 
     pointcloud_to_laserscan() : Node("pointcloud_to_laserscan") {
         // --ros-args -p min_height:=0.5 ...
-        declare_parameter("min_height", std::numeric_limits<double>::min());
-        declare_parameter("max_height", 0.5);
+        declare_parameter("min_height", -0.3);
+        declare_parameter("max_height", 0.0);
         declare_parameter("angle_min", -M_PI);
         declare_parameter("angle_max", M_PI);
         declare_parameter("angle_increment", M_PI / 180.0);
@@ -40,7 +40,7 @@ public:
             "scan", qos_profile);
 
         point_subscriber_ = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-            "livox/roi_lidar", qos_profile, std::bind(&pointcloud_to_laserscan::subscribe_cloud, this, _1));
+            "livox/lidar", qos_profile, std::bind(&pointcloud_to_laserscan::subscribe_cloud, this, _1));
     }
 private:
     void subscribe_cloud(const sensor_msgs::msg::PointCloud2::SharedPtr cloud) const {

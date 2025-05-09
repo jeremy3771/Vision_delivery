@@ -18,34 +18,26 @@ class Robot_Alignment : public rclcpp::Node {
 public:
     Robot_Alignment() : Node("Robot_Alignment") {
         timer_ = this->create_wall_timer(
-            100ms, std::bind(&Robot_Alignment::timer_cb, this));
+            500ms, std::bind(&Robot_Alignment::timer_cb, this));
         sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>(
             "scan", rclcpp::QoS(1).best_effort(), std::bind(&Robot_Alignment::scan_cb, this, _1));
     }
 
 private:
     void timer_cb() {
-        printf("Front Dist: %.3f, Left: %.3f, Right: %.3f, Angle: %.3f\n", front_dist_, left_dist_, right_dist_, angle_);
+        printf("Front Dist: %.3f, Right: %.3f, Angle: %.3f\n", front_dist_, right_dist_, angle_);
     }
     void scan_cb(const sensor_msgs::msg::LaserScan::ConstSharedPtr& msg) {
 		 front_dist_ = msg->ranges[179];
-		 left_dist_ = msg->ranges[269];
 		 right_dist_ = msg->ranges[89];
 
 		 // Change right and left
-		 // float right_45deg = msg->ranges[134];
-		 // float right_45deg_x = right_45deg * std::cos(45 * (PI / 180));
-		 // float right_45deg_y = right_45deg * std::sin(45 * (PI / 180));
+		 float right_60deg = msg->ranges[149];
+		 float right_60deg_x = right_60deg * std::cos(60 * (PI / 180));
+		 float right_60deg_y = right_60deg * std::sin(60 * (PI / 180));
 		 
-		 // float dx = right_45deg_x - right_dist_;
-		 // float dy = right_45deg_y;
-
-		 float left_45deg = msg->ranges[224];
-		 float left_45deg_x = left_45deg * std::cos(45 * (PI / 180));
-		 float left_45deg_y = left_45deg * std::sin(45 * (PI / 180));
-		 
-		 float dx = left_45deg_x - left_dist_;
-		 float dy = left_45deg_y;
+		 float dx = right_60deg_x - right_dist_;
+		 float dy = right_60deg_y;
 		 
 		 angle_ = std::atan2(dy, dx) * (180 / PI) - 90;
     }

@@ -5,7 +5,7 @@ using std::placeholders::_1;
 
 #define PI 3.1415926535897932
 
-ZLAC_Twist::ZLAC_Twist() : Node("ZLAC"), front_mots("/dev/ttyUSB0", 115200, 0x01), rear_mots("/dev/ttyUSB1", 115200, 0x01) {
+ZLAC_Twist::ZLAC_Twist() : Node("ZLAC"), front_mots("/dev/ttyZLRS00", 115200, 0x01), rear_mots("/dev/ttyZLRS01", 115200, 0x01) {
   declare_parameter("WO1", 0.285);
   declare_parameter("WO2", 0.285);
   declare_parameter("AW", 0.453);
@@ -15,7 +15,7 @@ ZLAC_Twist::ZLAC_Twist() : Node("ZLAC"), front_mots("/dev/ttyUSB0", 115200, 0x01
   get_parameter("AW", axleWidth_);
   get_parameter("WD", wheelDiameter_);
 
-  twist_sub_ = this->create_subscription<geometry_msgs::msg::Twist>("cmd_vel_smoothed", 1, std::bind(&ZLAC_Twist::twist_cb, this, _1));
+  twist_sub_ = this->create_subscription<geometry_msgs::msg::Twist>("cmd_vel_smoothed", rclcpp::QoS(1).best_effort(), std::bind(&ZLAC_Twist::twist_cb, this, _1));
   timer_ = this->create_wall_timer(50ms, std::bind(&ZLAC_Twist::timer_cb, this));
 }
 

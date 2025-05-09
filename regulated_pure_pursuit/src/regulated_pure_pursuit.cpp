@@ -121,31 +121,61 @@ RegulatedPurePursuitController::~RegulatedPurePursuitController()
     delete goal_checker_;
   }
 
+// transform tf
+void transformPose2D(
+  const geometry_msgs::msg::PoseStamped &in_pose,
+  geometry_msgs::msg::PoseStamped &out_pose,
+  const geometry_msgs::msg::TransformStamped &transform)
+{
+  double tx = transform.transform.translation.x;
+  double ty = transform.transform.translation.y;
+  double theta = tf2::getYaw(transform.transform.rotation);
+
+  double x = in_pose.pose.position.x;
+  double y = in_pose.pose.position.y;
+
+  out_pose.pose.position.x = tx + (x * std::cos(theta) - y * std::sin(theta));
+  out_pose.pose.position.y = ty + (x * std::sin(theta) + y * std::cos(theta));
+
+  double in_yaw = tf2::getYaw(in_pose.pose.orientation);
+  double out_yaw = in_yaw + theta;
+
+  tf2::Quaternion q;
+  q.setRPY(0, 0, out_yaw);
+  out_pose.pose.orientation = tf2::toMsg(q);
+  
+  out_pose.header.stamp = transform.header.stamp;
+  out_pose.header.frame_id = transform.header.frame_id;
+}
+
 void RegulatedPurePursuitController::configure()
 {
   readPathFromYAML();
-
+  tf_ = std::make_shared<tf2_ros::Buffer>(this->get_clock());
+  tf_->setUsingDedicatedThread(true);
+  
   clock_ = get_clock();
 
   double transform_tolerance = 0.1;
   goal_dist_tol_ = 0.25;  // reasonable default before first update
+  speed_warn_ = false;
 
-  declare_parameter("desired_linear_vel", 1.5);
+  declare_parameter("desired_linear_vel", 2.0);
   declare_parameter("min_lookahead_dist", 0.3);
-  declare_parameter("max_lookahead_dist", 0.9);
-  declare_parameter("lookahead_time", 1.5);
-  declare_parameter("rotate_to_heading_angular_vel", 1.0);
+  declare_parameter("max_lookahead_dist", 0.9); 
+  declare_parameter("lookahead_time", 2.0);
+  declare_parameter("rotate_to_heading_angular_vel", 0.7);
   declare_parameter("transform_tolerance", 0.1);
   declare_parameter("use_velocity_scaled_lookahead_dist", true);
   declare_parameter("approach_velocity_scaling_dist", 0.6);
   declare_parameter("use_regulated_linear_velocity_scaling", true);
-  declare_parameter("regulated_linear_scaling_min_radius", 0.9);
+  declare_parameter("regulated_linear_scaling_min_radius", 0.875);
   // applyConstraints func => min speed
   declare_parameter("regulated_linear_scaling_min_speed", 0.25);
   declare_parameter("use_rotate_to_heading", true);
-  declare_parameter("rotate_to_heading_min_angle", 0.785);
+  declare_parameter("rotate_to_heading_min_angle", 0.8);
   declare_parameter("max_angular_accel", 3.2);
-  declare_parameter("max_robot_pose_search_dist", -1.0);
+  declare_parameter("max_robot_pose_search_dist", 10.0);
   declare_parameter("use_interpolation", true);
 
   get_parameter("desired_linear_vel", desired_linear_vel_);
@@ -172,9 +202,11 @@ void RegulatedPurePursuitController::configure()
   odom_sub_ = this->create_subscription<nav_msgs::msg::Odometry>(
     "/Odometry", 10, std::bind(&RegulatedPurePursuitController::odom_cb, this, _1));
   twist_sub_ = this->create_subscription<geometry_msgs::msg::Twist>("cmd_vel_smoothed", 1, std::bind(&RegulatedPurePursuitController::twist_cb, this, _1));
-  vel_pub_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("cmd_vel", 10);
+  vel_pub_ = this->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
+  tf_sub_ = this->create_subscription<tf2_msgs::msg::TFMessage>("/tf", 10, std::bind(&RegulatedPurePursuitController::tf_cb, this, std::placeholders::_1));
   // carrot_pub_ = this->create_publisher<geometry_msgs::msg::PointStamped>("lookahead_point", 1);
   // carrot_arc_pub_ = this->create_publisher<nav_msgs::msg::Path>("lookahead_collision_arc", 1);
+  RCLCPP_INFO(this->get_logger(), "End config");
 }
 
 void RegulatedPurePursuitController::cleanup()
@@ -212,15 +244,13 @@ geometry_msgs::msg::TwistStamped RegulatedPurePursuitController::computeVelocity
     // goal_dist_tol_은 shouldRotateToGoalHeading에서 사용
     goal_dist_tol_ = pose_tolerance.position.x;
   }
-
   // Transform path to robot base frame
   auto transformed_plan = transformGlobalPlan(pose);
-
+  
   // Find look ahead distance and point on path and publish
   double lookahead_dist = getLookAheadDistance(speed);
-
   auto carrot_pose = getLookAheadPoint(lookahead_dist, transformed_plan);
-
+  RCLCPP_INFO(this->get_logger(), "carrot pose: x: %f, y: %f", carrot_pose.pose.position.x, carrot_pose.pose.position.y);
   double linear_vel, angular_vel;
 
   // Find distance^2 to look ahead point (carrot) in robot base frame
@@ -238,7 +268,7 @@ geometry_msgs::msg::TwistStamped RegulatedPurePursuitController::computeVelocity
   // Setting the velocity direction
   double sign = 1.0;
 
-  linear_vel = desired_linear_vel_;
+  linear_vel = velocities_[total_path_ - remain_path_];
 
   // Make sure we're in compliance with basic constraints
   double angle_to_heading;
@@ -246,8 +276,20 @@ geometry_msgs::msg::TwistStamped RegulatedPurePursuitController::computeVelocity
     double angle_to_goal = tf2::getYaw(transformed_plan.poses.back().pose.orientation);
     rotateToHeading(linear_vel, angular_vel, angle_to_goal);
   } else if (shouldRotateToPath(carrot_pose, angle_to_heading)) {
-    rotateToHeading(linear_vel, angular_vel, angle_to_heading);
+    if (current_twist_.linear.x > 0.8 || speed_warn_ == true) {
+      speed_warn_ = true;
+      
+      geometry_msgs::msg::TwistStamped cmd_vel;
+      cmd_vel.header = pose.header;
+      cmd_vel.twist.linear.x = 0.7;
+      cmd_vel.twist.angular.z = linear_vel * curvature;
+      
+      return cmd_vel;
+    } else {
+      rotateToHeading(linear_vel, angular_vel, angle_to_heading);
+    }
   } else {
+    speed_warn_ = false;
     applyConstraints(
       curvature, speed,
       transformed_plan,
@@ -255,6 +297,11 @@ geometry_msgs::msg::TwistStamped RegulatedPurePursuitController::computeVelocity
 
     // Apply curvature to angular velocity after constraining linear velocity
     angular_vel = linear_vel * curvature;
+  }
+
+  if (remain_path_ == 1 && std::sqrt(carrot_dist2) < 0.3) {
+    linear_vel = 0.0;
+    angular_vel = 0.0;
   }
 
   // populate and return message
@@ -270,14 +317,62 @@ void RegulatedPurePursuitController::odom_cb(const nav_msgs::msg::Odometry::Shar
   current_pose_.header = msg->header;
   current_pose_.pose = msg->pose.pose;
 
-  geometry_msgs::msg::TwistStamped cmd_vel;
-  cmd_vel = computeVelocityCommands(current_pose_, current_twist_, goal_checker_);
+  geometry_msgs::msg::TwistStamped cmd_vel_stamped;
+  geometry_msgs::msg::Twist cmd_vel;
+  cmd_vel_stamped = computeVelocityCommands(current_pose_, current_twist_, goal_checker_);
+  
+  cmd_vel.linear.x = cmd_vel_stamped.twist.linear.x;
+  cmd_vel.angular.z = cmd_vel_stamped.twist.angular.z;
+  
+  RCLCPP_INFO(this->get_logger(), "cmd_vel: x: %.2f, y: %.2f", cmd_vel.linear.x, cmd_vel.angular.z);
   vel_pub_->publish(std::move(cmd_vel));
 }
 
 void RegulatedPurePursuitController::twist_cb(const geometry_msgs::msg::Twist msg)
 {
   current_twist_ = msg;
+}
+
+void RegulatedPurePursuitController::tf_cb(const tf2_msgs::msg::TFMessage::SharedPtr msg)
+{
+  for (const auto & transform : msg->transforms) {
+    if (transform.header.frame_id == "map" && transform.child_frame_id == "odom") {
+      map2odom_tf_ = transform;
+      getOdomToMapTransform(odom2map_tf_);
+      break;
+    }
+  }
+}
+
+bool RegulatedPurePursuitController::getOdomToMapTransform(geometry_msgs::msg::TransformStamped & odom_to_map)
+{
+  // Check if the map2odom_tf_ has been received
+  if (map2odom_tf_.header.frame_id.empty() || map2odom_tf_.child_frame_id.empty()) {
+    RCLCPP_ERROR(this->get_logger(), "map2odom_tf_ is not initialized.");
+    return false;
+  }
+
+  try {
+    // Convert the geometry_msgs Transform to a tf2 Transform
+    tf2::Transform map_to_odom;
+    tf2::fromMsg(map2odom_tf_.transform, map_to_odom);
+
+    // Invert the transform to get odom to map
+    tf2::Transform odom_to_map_tf = map_to_odom.inverse();
+
+    // Convert the inverted tf2 Transform back to geometry_msgs Transform
+    odom_to_map.transform = tf2::toMsg(odom_to_map_tf);
+
+    // Set the header information appropriately
+    odom_to_map.header.stamp = map2odom_tf_.header.stamp;
+    odom_to_map.header.frame_id = map2odom_tf_.child_frame_id; // "odom"
+    odom_to_map.child_frame_id = map2odom_tf_.header.frame_id; // "map"
+
+    return true;
+  } catch (const tf2::TransformException & ex) {
+    RCLCPP_ERROR(this->get_logger(), "Failed to invert map2odom transform: %s", ex.what());
+    return false;
+  }
 }
 
 void RegulatedPurePursuitController::readPathFromYAML()
@@ -307,6 +402,7 @@ void RegulatedPurePursuitController::readPathFromYAML()
 
   global_plan_.header.frame_id = "map";
   RCLCPP_INFO(this->get_logger(), "Path loaded with %zu points from %s", global_plan_.poses.size(), yaml_file_path.c_str());
+  total_path_ = global_plan_.poses.size();
 }
 
 bool RegulatedPurePursuitController::shouldRotateToPath(
@@ -377,9 +473,14 @@ geometry_msgs::msg::PoseStamped RegulatedPurePursuitController::getLookAheadPoin
   // Find the first pose which is at a distance greater than the lookahead distance
   auto goal_pose_it = std::find_if(
     transformed_plan.poses.begin(), transformed_plan.poses.end(), [&](const auto & ps) {
-      return hypot(ps.pose.position.x, ps.pose.position.y) >= lookahead_dist;
+      RCLCPP_INFO(this->get_logger(), "transformPose2D size : %ld", transformed_plan.poses.size());
+      RCLCPP_INFO(this->get_logger(), "hypot: %f", hypot(ps.pose.position.x, ps.pose.position.y));
+      RCLCPP_INFO(this->get_logger(), "lookdist: %f", lookahead_dist);
+      return ps.pose.position.x > 0.0 && hypot(ps.pose.position.x, ps.pose.position.y) >= lookahead_dist;
     });
-
+  
+  RCLCPP_INFO(this->get_logger(), "goal_pose x: %f, y: %f", goal_pose_it->pose.position.x, goal_pose_it->pose.position.y);
+  
   // If the no pose is not far enough, take the last pose
   if (goal_pose_it == transformed_plan.poses.end()) {
     goal_pose_it = std::prev(transformed_plan.poses.end());
@@ -397,6 +498,7 @@ geometry_msgs::msg::PoseStamped RegulatedPurePursuitController::getLookAheadPoin
     pose.header.frame_id = prev_pose_it->header.frame_id;
     pose.header.stamp = goal_pose_it->header.stamp;
     pose.pose.position = point;
+
     return pose;
   }
 
@@ -468,12 +570,11 @@ nav_msgs::msg::Path RegulatedPurePursuitController::transformGlobalPlan(
 {
   // let's get the pose of the robot in the frame of the plan
   geometry_msgs::msg::PoseStamped robot_pose;
-  transformPose(global_plan_.header.frame_id, pose, robot_pose);
-
-  // max_robot_pose_search_dist_ == -1 => end 리턴
+  robot_pose = pose;
+  
   auto closest_pose_upper_bound = first_after_integrated_distance(
     global_plan_.poses.begin(), global_plan_.poses.end(), max_robot_pose_search_dist_);
-
+  
   // First find the closest pose on the path to the robot
   // bounded by when the path turns around (if it does) so we don't get a pose from a later
   // portion of the path
@@ -498,11 +599,10 @@ nav_msgs::msg::Path RegulatedPurePursuitController::transformGlobalPlan(
       stamped_pose.header.frame_id = global_plan_.header.frame_id;
       stamped_pose.header.stamp = robot_pose.header.stamp;
       stamped_pose.pose = global_plan_pose.pose;
-      transformPose(current_pose_.header.frame_id, stamped_pose, transformed_pose);
+      transformPose2D(stamped_pose, transformed_pose, odom2map_tf_);
       transformed_pose.pose.position.z = 0.0;
       return transformed_pose;
     };
-
   // Transform the near part of the global plan into the robot's frame of reference.
   nav_msgs::msg::Path transformed_plan;
   std::transform(
@@ -511,7 +611,6 @@ nav_msgs::msg::Path RegulatedPurePursuitController::transformGlobalPlan(
     transformGlobalPoseToLocal);
   transformed_plan.header.frame_id = current_pose_.header.frame_id;
   transformed_plan.header.stamp = robot_pose.header.stamp;
-
   // Remove the portion of the global plan that we've already passed so we don't
   // process it on the next iteration (this is called path pruning)
   global_plan_.poses.erase(begin(global_plan_.poses), transformation_begin);
@@ -519,7 +618,7 @@ nav_msgs::msg::Path RegulatedPurePursuitController::transformGlobalPlan(
   // if (transformed_plan.poses.empty()) {
   //   throw nav2_core::PlannerException("Resulting plan has 0 poses in it.");
   // }
-
+  remain_path_ = global_plan_.poses.size();
   return transformed_plan;
 }
 
@@ -562,9 +661,16 @@ bool RegulatedPurePursuitController::transformPose(
     out_pose = in_pose;
     return true;
   }
-
   try {
+    if (!tf_) {
+    RCLCPP_ERROR(logger_, "TF listener is not initialized!");
+    return false;
+    }
+    
+    RCLCPP_INFO(logger_, "Transforming from frame: %s to frame: %s", in_pose.header.frame_id.c_str(), frame.c_str());
     tf_->transform(in_pose, out_pose, frame, transform_tolerance_);
+    
+    RCLCPP_INFO(this->get_logger(), "end transformPose using tf_");
     out_pose.header.frame_id = frame;
     return true;
   } catch (tf2::TransformException & ex) {
